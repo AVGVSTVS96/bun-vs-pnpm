@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Moon, Sun, Search } from 'lucide-react'
-import { Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 type Command = {
   pnpm: string
@@ -26,41 +25,45 @@ const sections: Section[] = [
       { pnpm: "pnpm install", bun: "bun install", note: "✓" },
       { pnpm: "pnpm remove", bun: "bun remove", note: "✓" },
       { pnpm: "pnpm update", bun: "bun update", note: "✓" },
+      { pnpm: "pnpm outdated", bun: "bun outdated", note: "✓" },
+      { pnpm: "pnpm link", bun: "bun link", note: "✓" },
+      { pnpm: "pnpm patch", bun: "bun patch", note: "✓" },
       { pnpm: "pnpm dedupe", bun: "None", note: "No deduplication" },
-      { pnpm: "pnpm audit", bun: "None", note: "No security checks" },
-      { pnpm: "pnpm outdated", bun: "None", note: "Can't check updates" },
+      { pnpm: "pnpm prune", bun: "None", note: "No cleanup tools" },
     ]
   },
   {
     title: "Monorepo",
     commands: [
-      { pnpm: "pnpm -r run build", bun: "None", note: "No recursive commands" },
-      { pnpm: "pnpm filter <pattern>", bun: "bun --filter <pattern>", note: "Basic only" },
-      { pnpm: "pnpm -r publish", bun: "None", note: "No publishing" },
+      { pnpm: "pnpm -r <command>", bun: "None", note: "No recursive commands" },
+      { pnpm: "pnpm <command> --filter <pattern>", bun: "bun <command> --filter <pattern>", note: "✓" },
     ]
   },
   {
-    title: "Package Info",
+    title: "Package and Info",
     commands: [
+      { pnpm: "pnpm publish", bun: "bun publish", note: "✓" },
       { pnpm: "pnpm list", bun: "bun pm ls", note: "✓" },
+      { pnpm: "pnpm audit", bun: "None", note: "No security checks" },
       { pnpm: "pnpm why", bun: "None", note: "No dep analysis" },
+      { pnpm: "pnpm pack", bun: "bun pm pack", note: "✓" },
       { pnpm: "pnpm root", bun: "None", note: "No root info" },
     ]
   },
   {
     title: "Store & Cache",
     commands: [
+      { pnpm: "pnpm cache clean", bun: "bun pm cache rm", note: "✓" },
       { pnpm: "pnpm store status", bun: "None", note: "No store management" },
       { pnpm: "pnpm store prune", bun: "None", note: "No cleanup tools" },
-      { pnpm: "pnpm cache clean", bun: "None", note: "No cache control" },
+      { pnpm: "pnpm cache view", bun: "None", note: "No cache view or list" },
     ]
   },
   {
     title: "Script Running",
     commands: [
       { pnpm: "pnpm run", bun: "bun run", note: "✓" },
-      { pnpm: "pnpm run -r", bun: "None", note: "No recursive" },
-      { pnpm: "pnpm exec", bun: "bun pm exec", note: "✓" },
+      { pnpm: "pnpm exec", bun: "None", note: "No exec" },
       { pnpm: "pnpm run --parallel", bun: "None", note: "No parallel" },
     ]
   },
@@ -76,14 +79,14 @@ export function PackageManagerComparison() {
 
   const filteredSections = sections.map(section => ({
     ...section,
-    commands: section.commands.filter(command => 
+    commands: section.commands.filter(command =>
       command.pnpm.toLowerCase().includes(searchTerm.toLowerCase()) ||
       command.bun.toLowerCase().includes(searchTerm.toLowerCase()) ||
       command.note.toLowerCase().includes(searchTerm.toLowerCase())
     )
   })).filter(section => section.commands.length > 0)
 
-  const missingCommands = sections.flatMap(section => 
+  const missingCommands = sections.flatMap(section =>
     section.commands.filter(command => command.bun === "None")
   ).length
 
